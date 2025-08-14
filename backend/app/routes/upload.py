@@ -1,10 +1,22 @@
-from fastapi import APIRouter, UploadFile, File
+from fastapi import APIRouter, UploadFile, File, Request
 from app.services.pdf_parser import parse_pdf
-from app.models.upload import UploadResponse
+from app.AI.summary import getSummary
 
 router = APIRouter()
 
-@router.post("/upload", response_model=UploadResponse)
-async def upload(file: UploadFile = File(...)):
+@router.post("/upload")
+async def upload(request: Request, file: UploadFile = File(...)):
     text = await parse_pdf(file)
-    return {"filename": file.filename, "content": text}
+    summary = await getSummary(contract_text=text)
+
+    request.app.state.uploaded_result = {
+        "filedetails": {
+            "filename": file.filename,
+            "content": text
+        },
+        "results": {
+            "output": file.filename,
+            "result": summary
+        }
+    }
+    return request.app.state.uploaded_result
