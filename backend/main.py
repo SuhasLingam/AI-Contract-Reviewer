@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.core.config import setup_cors
-from app.routes import root, upload, results, rag
+from app.routes import root, upload, results
 
 app = FastAPI()
 
@@ -12,7 +12,6 @@ app.state.uploaded_result = None
 app.include_router(root.router)
 app.include_router(upload.router)
 app.include_router(results.router)
-app.include_router(rag.router)
 
 if __name__ == "__main__":
     import uvicorn
