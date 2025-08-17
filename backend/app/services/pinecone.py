@@ -7,8 +7,9 @@ load_dotenv()
 google_api_key=os.getenv("GOOGLE_API_KEY")
 pinecone_api_key=os.getenv("PINECONE_API_KEY")
 
+pc = Pinecone(api_key=pinecone_api_key)
+
 def pinecone(chunks , embedded_vectors):
-    pc = Pinecone(api_key=pinecone_api_key)
 
     index_name="contract-index"
 

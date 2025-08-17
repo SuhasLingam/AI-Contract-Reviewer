@@ -2,7 +2,7 @@ from langchain_openai import ChatOpenAI
 from langchain.prompts import PromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.output_parsers import StrOutputParser
-from app.AI.template import template
+from app.AI.template import SUMMARY_TEMPLATE
 import os
 from dotenv import load_dotenv
 load_dotenv()
@@ -19,7 +19,7 @@ model="gemini-1.5-flash"
 async def getSummary(contract_text: str):
     prompt = PromptTemplate(
         input_variables=["contract_text"],
-        template=template
+        template=SUMMARY_TEMPLATE
     )
 
     llm = ChatGoogleGenerativeAI(
