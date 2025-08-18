@@ -1,32 +1,13 @@
-# API Framework
 fastapi
 uvicorn
-
-# File Parsing
-pdfplumber
-python-docx
-pillow
-pytesseract
-PyMuPDF
-PyPDF2
-
-# AI & Prompt Management
-openai
-google-genai
-anthropic
-langchain
-tiktoken
-
-# Vector DB (Pinecone)
-pinecone-client
-
-# Utilities
-python-dotenv
-requests
 pydantic
-
-# Optional Output Formatting
-fpdf2
-markdown
-beautifulsoup4
-json-repair
+python-dotenv
+PyPDF2
+langchain
+langchain-core
+langchain-google-genai
+langchain-openai
+pinecone
+dotenv
+os
+io
