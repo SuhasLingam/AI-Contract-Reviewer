@@ -1,4 +1,5 @@
 from fastapi import APIRouter, UploadFile, File, Request
+from pydantic import BaseModel
 from app.services.pdf_parser import parse_pdf
 from app.AI.summary import getSummary
 from app.services.chunk import createChunks
@@ -7,6 +8,9 @@ from app.services.pinecone import pinecone, pc
 from app.AI.RagRetrival import RagRetrival
 
 router = APIRouter()
+
+class QuestionRequest(BaseModel):
+    question: str
 
 @router.post("/upload")
 async def upload(request: Request, file: UploadFile = File(...)):
@@ -37,20 +41,20 @@ async def upload(request: Request, file: UploadFile = File(...)):
     }
 
 @router.post("/ask-contract")
-async def ask_contract(question: str):
+async def ask_contract(request: QuestionRequest):
     index_name = "contract-index"
     index = pc.Index(index_name)
 
-    question_vector = embedding.embed_query(question)
+    question_vector = embedding.embed_query(request.question)
     
     results = index.query(vector=question_vector, top_k=10, include_metadata=True)
     chunks = [match["metadata"]["text"] for match in results["matches"]]
     context = "\n\n".join(chunks)
 
     # RAG step
-    response = await RagRetrival(context=context, question=question)
+    response = await RagRetrival(context=context, question=request.question)
 
     return {
-        "query": question,
+        "query": request.question,
         "response": response
     }
