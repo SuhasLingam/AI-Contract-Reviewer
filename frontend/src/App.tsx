@@ -7,6 +7,11 @@ import TabNavigation from "./components/Layout/TabNavigation";
 import AnalysisPage from "./pages/AnalysisPage";
 import ChatPage from "./pages/ChatPage";
 
+const RAW_BACKEND_URL = import.meta.env.PROD
+  ? (import.meta.env.BACKEND_URL as string)
+  : "http://127.0.0.1:8000";
+const BACKEND_BASE_URL = (RAW_BACKEND_URL || "").replace(/\/+$/, "");
+
 function App() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -47,7 +52,7 @@ function App() {
 
     try {
       // Step 1 — Upload
-      const uploadRes = await fetch("http://127.0.0.1:8000/upload", {
+      const uploadRes = await fetch(`${BACKEND_BASE_URL}/upload`, {
         method: "POST",
         body: formData,
       });
@@ -57,7 +62,7 @@ function App() {
       console.log("Upload response:", uploadData);
 
       // Step 2 — Fetch results
-      const resultsRes = await fetch("http://127.0.0.1:8000/results");
+      const resultsRes = await fetch(`${BACKEND_BASE_URL}/results`);
       if (!resultsRes.ok) throw new Error("Failed to fetch results");
 
       const data = await resultsRes.json();
@@ -95,7 +100,7 @@ function App() {
     setChatLoading(true);
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/ask-contract", {
+      const response = await fetch(`${BACKEND_BASE_URL}/ask-contract`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
