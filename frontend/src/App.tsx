@@ -14,6 +14,7 @@ const BACKEND_BASE_URL = (RAW_BACKEND_URL || "").replace(/\/+$/, "");
 
 function App() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [currentDocId, setCurrentDocId] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [results, setResults] = useState<any | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -32,6 +33,7 @@ function App() {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       setSelectedFile(event.target.files[0]);
+      setCurrentDocId(null);
       setResults(null);
       setError(null);
       setChatMessages([]);
@@ -60,6 +62,9 @@ function App() {
 
       const uploadData = await uploadRes.json();
       console.log("Upload response:", uploadData);
+      if (uploadData.doc_id) {
+        setCurrentDocId(uploadData.doc_id);
+      }
 
       // Step 2 — Fetch results
       const resultsRes = await fetch(`${BACKEND_BASE_URL}/results`);
@@ -107,6 +112,7 @@ function App() {
         },
         body: JSON.stringify({
           question: chatQuery,
+          doc_id: currentDocId,
         }),
       });
 

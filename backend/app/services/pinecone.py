@@ -12,9 +12,9 @@ def get_pinecone_client():
         raise ValueError("PINECONE_API_KEY environment variable is not set. Please set it in backend/.env")
     return Pinecone(api_key=pinecone_api_key)
 
-def pinecone(chunks , embedded_vectors):
+def pinecone(chunks, embedded_vectors, doc_id=None):
     pc = get_pinecone_client()
-    index_name="contract-index"
+    index_name = "contract-index"
 
     dimension = len(embedded_vectors[0]) if embedded_vectors else 768
 
@@ -33,12 +33,16 @@ def pinecone(chunks , embedded_vectors):
     
     index = pc.Index(index_name)
     
-    def generate_id(text):
-        return hashlib.md5(text.encode("utf-8")).hexdigest()
+    def generate_id(doc_id, idx, text):
+        raw = f"{doc_id}_{idx}_{text}" if doc_id else f"{text}_{idx}"
+        return hashlib.md5(raw.encode("utf-8")).hexdigest()
 
     to_upsert = []
-    for chunk, vector in zip(chunks, embedded_vectors):
-        vector_id = generate_id(chunk)  # deterministic ID
-        to_upsert.append((vector_id, vector, {"text": chunk}))
+    for idx, (chunk, vector) in enumerate(zip(chunks, embedded_vectors)):
+        vector_id = generate_id(doc_id, idx, chunk)
+        metadata = {"text": chunk}
+        if doc_id:
+            metadata["doc_id"] = doc_id
+        to_upsert.append((vector_id, vector, metadata))
     
     index.upsert(vectors=to_upsert)
