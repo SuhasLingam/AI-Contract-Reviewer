@@ -1,4 +1,10 @@
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+# pyrefly: ignore [missing-import]
+try:
+    # pyrefly: ignore [missing-import]
+    from langchain_text_splitters import RecursiveCharacterTextSplitter
+except ImportError:
+    # pyrefly: ignore [missing-import]
+    from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 async def createChunks(contract_text):
     textspiltter = RecursiveCharacterTextSplitter(

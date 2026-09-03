@@ -3,8 +3,8 @@ from pydantic import BaseModel
 from app.services.pdf_parser import parse_pdf
 from app.AI.summary import getSummary
 from app.services.chunk import createChunks
-from app.services.embedding import createEmbeddings, embedding
-from app.services.pinecone import pinecone, pc
+from app.services.embedding import createEmbeddings, get_embedding
+from app.services.pinecone import pinecone, get_pinecone_client
 from app.AI.RagRetrival import RagRetrival
 
 router = APIRouter()
@@ -42,10 +42,12 @@ async def upload(request: Request, file: UploadFile = File(...)):
 
 @router.post("/ask-contract")
 async def ask_contract(request: QuestionRequest):
+    pc = get_pinecone_client()
     index_name = "contract-index"
     index = pc.Index(index_name)
 
-    question_vector = embedding.embed_query(request.question)
+    emb = get_embedding()
+    question_vector = emb.embed_query(request.question)
     
     results = index.query(vector=question_vector, top_k=10, include_metadata=True)
     chunks = [match["metadata"]["text"] for match in results["matches"]]
